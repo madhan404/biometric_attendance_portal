@@ -28,7 +28,7 @@ A comprehensive attendance management system for educational institutions.
 
 1. Clone the repository:
 ```bash
-git clone <your-repo-url>
+git clone <https://github.com/madhan404/biometric_attendance_portal.git>
 cd attendance-portal
 ```
 
