@@ -1,65 +1,7 @@
 const express =require('express');
-const devicelog= require("../config/config");
+const devicelog= require("../config/db");
 const Request = require('../models/Leave')
 const app = express();
-
-
-// Get Request form status based on id
-// app.post('/leavests',async (req,res)=>{
-//     const {sin_number,student_name,class_advisor_approval,hod_approval,
-//         principal_approval,placement_officer_approval}=req.body;
-//     try{
-//         const sts = await Request.findOne({
-//             where:{sin_number},
-
-//         });
-//         const responseData = {
-//             status:200,
-//             message:"leave sts got for gvn sin",
-//             student_name: sts.student_name,
-//             class_advisor_approval : sts.class_advisor_approval,
-//             hod_approval: sts.hod_approval,
-//             principal_approval:sts.principal_approval,
-//             placement_officer_approval: sts.placement_officer_approval
-//         }
-//         res.json(responseData);
-//     }catch(err){
-        
-//         res.status(500).json({error:"db error"})
-//         console.error(err);
-//     }
-// })
-
-
-// app.post('/leavests', async (req, res) => {
-//     const { sin_number } = req.body;
-    
-//     try {
-//         const sts = await Request.findOne({ where: { sin_number } });
-
-//         if (!sts) {
-//             return res.status(404).json({ error: "Request not found" });
-//         }
-
-//         console.log("Fetched PDF Data Length:", sts.pdf_path ? sts.pdf_path.length : "NULL");
-
-//         const responseData = {
-//             status: 200,
-//             message: "Leave status retrieved successfully",
-//             student_name: sts.student_name,
-//             class_advisor_approval: sts.class_advisor_approval,
-//             hod_approval: sts.hod_approval,
-//             principal_approval: sts.principal_approval,
-//             placement_officer_approval: sts.placement_officer_approval, pdf_data: sts.pdf_path ? sts.pdf_path.toString('base64') : null // ✅ Converts PDF to Base64
-//             // pdf_present: !!sts.pdf_path // ✅ Check if PDF data exists
-//         };
-
-//         res.json(responseData);
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ error: "Database error" });
-//     }
-// });
 
 
 app.post("/leavests", async (req, res) => {
@@ -74,12 +16,14 @@ app.post("/leavests", async (req, res) => {
   
       const responseData = leaveRequests.map((sts) => ({
         status: 200,
-        message: "Leave status retrieved successfully",
+        message: "Leave status retrieved for student successfully",
         request_id: sts.request_id,
         student_name: sts.student_name,
+        sin_number:sts.sin_number,
         request_type: sts.request_type, // Include request_type in the response
-        request_type:sts.request_type,
+        reason_Details:sts.reason_Details,
         reason:sts.reason,
+        time_slot:sts.time_slot,
         createdAt:sts.createdAt,
         startDate:sts.startDate,
         endDate:sts.endDate,

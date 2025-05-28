@@ -10,8 +10,13 @@ const User = sequelize.define("user", {
   sin_number: {
     type: DataTypes.STRING,
     allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Sin number cannot be null'
+      }
+    }
   },
-  student_name: {
+  name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -21,6 +26,7 @@ const User = sequelize.define("user", {
   },
   email: {
     type: DataTypes.STRING,
+    allowNull: false,
   },
   password: {
     type: DataTypes.STRING,
@@ -30,22 +36,51 @@ const User = sequelize.define("user", {
     type:DataTypes.STRING,
     allowNull:true,
   },
-  father_name: DataTypes.STRING,
+  class_advisor:{
+    type:DataTypes.STRING,
+    allowNull: true
+  },
+  mentor:{
+    type:DataTypes.STRING,
+    allowNull:true
+  },
   year: DataTypes.STRING,
   department: DataTypes.STRING,
   college: DataTypes.STRING,
   dayScholar_or_hosteller: DataTypes.STRING,
   quota: DataTypes.STRING,
   role: {
-    type: DataTypes.JSON,
-    defaultValue: null,
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  position_1:{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  position_2:{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  is_deleted: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  deleted_at: {
+    type: DataTypes.DATE
   },
   phone: DataTypes.STRING,
-  photo: DataTypes.TEXT,
+  parent_phone: DataTypes.STRING,
+  // photo: DataTypes.TEXT,
+  photo: {
+    type: DataTypes.TEXT('long'),
+    allowNull: true
+  },
+
   batch: DataTypes.STRING(45),
 }, {
   tableName: "user",
   timestamps: false,
+  paranoid: true
 });
 
 module.exports = User;

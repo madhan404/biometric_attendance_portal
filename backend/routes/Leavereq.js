@@ -1,77 +1,11 @@
-
-// const express = require('express');
-// const bodyParser = require('body-parser');
-// const multer = require('multer');
-// const Request = require('../models/Leave');
-// const { where } = require('sequelize');
-// const app = express();
-// app.use(bodyParser.json());
-
-
-// const storage = multer.memoryStorage();  // No destination needed for memory storage
-
-// const upload = multer({ 
-//     storage,
-//     limits: { fileSize: 10 * 1024 * 1024 }, // Limit file size to 10MB
-//     fileFilter: (req, file, cb) => {
-//         if (file.mimetype === 'application/pdf') {
-//             cb(null, true);
-//         } else {
-//             cb(new Error('Only PDF files are allowed'), false);
-//         }
-//     }
-// });
-
-
-// // Post the student leave request
-// app.post('/std-request', upload.single('pdf'), async (req, res) => {
-//     console.log("Received File:", req.file);  // ✅ Check if multer is getting the file
-//     const { sin_number, student_name, department, year, startDate, endDate, request_type, reason } = req.body;
-// //student_name 
-
-// try {
-    
-//     const reqcount = await Request.count({ where: { request_type } });
-//     const reqid = `${request_type}-00${reqcount + 1}`;
-    
-//     let pdfData = null;
-//     if (request_type === 'internship') {
-//         if (!req.file) {
-//             return res.status(400).json({ error: 'PDF upload is required for internship requests' });
-//         }
-//         pdfData = req.file.buffer; 
-//         console.log("PDF Buffer Length:", req.file.buffer.length);  // ✅ Check if buffer exists
-//         }
-
-        
-//         const request = await Request.create({
-//             sin_number,
-//             student_name,
-//             department,
-//             year,
-//             request_type,
-//             reason,
-//             startDate,
-//             endDate,
-//             request_id: reqid,
-//             pdf_path: pdfData, 
-//         });
-
-//         console.log("Saved Request ID:", request.request_id);  // ✅ Check if DB save work
-
-//         res.json({ message: `Request submitted successfully with ID ${reqid}`, req_id: reqid });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ error: 'Database error' });
-//     }
-// });
-
 const express = require('express');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const multer = require('multer');
 const Request = require('../models/Leave');
-const app = express();
-app.use(bodyParser.json());
+const { v4: uuidv4 } = require('uuid');
+
+const app =express();
+app.use(express.json());
 
 const upload = multer({ 
     storage: multer.memoryStorage(),
@@ -86,235 +20,234 @@ const upload = multer({
   });
 
 
-
-// Post the student leave request
-app.post('/std-request', upload.single('pdf'), async (req, res) => {
-  console.log("Received File:", req.file); // Debug: Check if the file is received
-  const { sin_number, student_name, department, year, startDate, endDate, request_type, reason,reason_Details } = req.body;
-
-  try {
-    const reqcount = await Request.count({ where: { request_type } });
-    const reqid = `${request_type}-00${reqcount + 1}`;
-
-    let pdfData = null;
-    if (request_type === 'internship') {
-      if (!req.file) {
-        return res.status(400).json({ error: 'PDF upload is required for internship requests' });
-      }
-      pdfData = req.file.buffer; // Store the PDF file buffer
-      console.log("PDF Buffer Length:", req.file.buffer.length); // Debug: Check the buffer length
+  app.post('/std-request', upload.single('pdf'), async (req, res) => {
+    try {
+      // Debug logging
+      console.log("Request received with file:", req.file);
+      console.log("Request body:", req.body);
+  
+      // Normalize request type
+      const request_type = req.body.request_type?.toLowerCase() || '';
+      
+      // Handle PDF for internship
+      let pdfBuffer = null;
+    //   if (request_type === 'internship') {
+        if (request_type === 'internship' || request_type === 'od' || request_type === 'leave') {
+          if (request_type === 'od' || request_type === 'leave') {
+            if (!req.body.startDate || !req.body.endDate) {
+              return res.status(400).json({ error: 'Start and end dates are required for OD/Leave requests' });
+            }
+          }
+          if (!req.file) {
+            console.error("No PDF uploaded for internship request");
+            return res.status(400).json({ error: 'PDF required for internship/od/leave request' });
+          }
+          pdfBuffer = req.file.buffer;
+        }
+  
+      // Process request
+      const request = await Request.create({
+        ...req.body,
+        request_id: uuidv4(),
+        pdf_path: pdfBuffer
+      });
+  
+      res.json({ 
+        success: true,
+        request_id: request.request_id
+      });
+      
+    } catch (error) {
+      console.error("Request processing error:", error);
+      res.status(500).json({
+        error: "Internal server error",
+        details: error.message
+      });
     }
+  });
 
-    const request = await Request.create({
-      sin_number,
-      student_name,
-      department,
-      year,
-      request_type,
-      reason,
-      reason_Details,
-      startDate,
-      endDate,
-      request_id: reqid,
-      pdf_path: pdfData, // Store the PDF file in the database
-    });
-
-    console.log("Saved Request ID:", request.request_id); // Debug: Check if the request is saved
-    console.log("PDF Data Stored:", request.pdf_path ? request.pdf_path.length : "NULL"); // Debug: Check if PDF data is stored
-
-    res.json({ message: `Request submitted successfully with ID ${reqid}`, req_id: reqid });
-  } catch (err) {
-    console.error("Error:", err); // Debug: Log the error
-    res.status(500).json({ error: 'Database error' });
-  }
-});
 
 // Post the staff leave request
-app.post('/staff-leave-req',async (req,res)=>{
-    const {sin_number,staff_name,department,
-        request_type,reason,startDate,endDate}= req.body;
-        try{
-            const reqcount = await Request.count({where:{request_type}});
-            const reqid = `${request_type}- 00${reqcount +1}`;
-
-            const request = await Request.create({
-                request_id :reqid,
-                sin_number,staff_name,
-                department,
-                request_type,
-                reason,
-                startDate,endDate,
-                hod_approval:'pending',
-                principal_approval:'pending'
-            });
-            res.json({ message:`requst submted suceessfully ${reqid}`,req_id : reqid})
-        }catch(err){
-            res.status(500).json({error:' db error'});
-            console.log(err);
-            
-        }
-});
-
-// Post the hod leave request
-app.post('/hod-leave-req',async(req,res)=>{
-    const {sin_number,hod_name,department,
-        request_type,reason,startDate,endDate}= req.body;
-
-        try{
-            const reqcount= await Request.count({where:{request_type}});
-            const reqid =`${request_type}- 00${reqcount+1}`;
-            const request = await Request.create({
-
-                request_id:reqid,
-                sin_number,hod_name,department,request_type,reason,
-                startDate,endDate,
-                principal_approval:'pending'
-            });
-            res.json({message:`request submitted successdully ${reqid}`,req_id:reqid})
-        }catch(err){
-            res.status(500).json({errror:'db errro'});
-        }
-});
-
-// CA approval
-app.post('/class-advisor-approval', async (req, res) => {
-    const { sin_number, approval_status } = req.body;
-
+app.post('/staff-leave-req', upload.single('pdf'), async (req, res) => {
     try {
-        const request = await Request.findOne({
-            where: { sin_number },
-            order: [['createdAt', 'Desc']]
-        });
+        // Debug logging
+        console.log("Request received with file:", req.file);
+        console.log("Request body:", req.body);
 
-        if (!request) {
-            return res.status(400).json({ error: `Request not found for ${sin_number}` });
+        console.log("BODY:", req.body);
+console.log("FILES:", req.file);
+
+        const {sin_number, staff_name, department,
+            request_type, reason, reason_Details, startDate, endDate, time_slot} = req.body;
+
+        // Normalize request type
+        const normalized_request_type = request_type?.toLowerCase() || '';
+
+        // Handle PDF for requests
+        let pdfBuffer = null;
+        if (normalized_request_type === 'od' || normalized_request_type === 'leave') {
+            if (!startDate || !endDate) {
+                return res.status(400).json({ error: 'Start and end dates are required for OD/Leave requests' });
+            }
+            if (!req.file) {
+                console.error("No PDF uploaded for request");
+                return res.status(400).json({ error: 'PDF required for this request type' });
+            }
+            pdfBuffer = req.file.buffer;
+        } else if (normalized_request_type === 'permission') {
+            // PDF might be optional for permission, let's assume it's not strictly required unless specified.
+            // However, startDate and time_slot are essential.
+            if (!startDate || !time_slot) {
+                return res.status(400).json({ error: 'Start date and time slot are required for permission requests' });
+            }
+            if (req.file) {
+                console.log("PDF uploaded for permission request, will be saved.");
+                pdfBuffer = req.file.buffer; // Save PDF if provided
+            } else {
+                console.log("No PDF uploaded for permission request, proceeding without it.");
+            }
+        }else {
+            return res.status(400).json({ error: 'Invalid request type. Must be od, leave, or permission' });
         }
 
-        if (request.class_advisor_approval !== 'pending') {
-            return res.status(400).json({ error: `Request already ${approval_status} by class advisor` });
-        }
+        const reqid = uuidv4();
 
-        request.class_advisor_approval = approval_status;
-        await request.save();
-
-        res.json({ message: 'Class advisor approval updated' });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-
-app.post('/hod-approval', async (req, res) => {
-    const { sin_number, approval_status } = req.body;
-
-    try {
-        const request = await Request.findOne({
-            where: { sin_number },
-            order: [['createdAt', 'Desc']]
-        });
-
-        if (!request) {
-            return res.status(400).json({ error: `Request not found for ${sin_number}` });
-        }
-
-        if (request.class_advisor_approval !== 'approved') {
-            return res.status(400).json({ error: 'Class advisor approval is required' });
-        }
-
-        if (request.hod_approval !== 'pending') {
-            return res.status(400).json({ error: `Request already ${approval_status} by HOD` });
-        }
-
-        request.hod_approval = approval_status;
-        await request.save();
-
-        res.json({ message: 'HOD approval updated' });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-
-app.post('/placement-officer-approval', async (req, res) => {
-    const { sin_number, approval_status } = req.body;
-
-    try {
-        const request = await Request.findOne({
-            where: { sin_number, request_type: 'internship' },
-            order: [["createdAt", "Desc"]]
-        });
-
-        if (!request) {
-            return res.status(400).json({ error: `Internship request not found for ${sin_number}` });
-        }
-
-        if (request.hod_approval !== 'approved') {
-            return res.status(400).json({ error: 'HOD approval is required' });
-        }
-
-        if (request.placement_officer_approval !== 'pending') {
-            return res.status(400).json({ error: `Request already ${approval_status} by Placement Officer` });
-        }
-
-        request.placement_officer_approval = approval_status;
-        await request.save();
-
-        res.json({ message: 'Placement officer approval updated' });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-
-app.post('/principal-approval', async (req, res) => {
-    const { sin_number, approval_status } = req.body;
-
-    try {
-        const request = await Request.findOne({
-            where: { sin_number },
-            order: [["createdAt", "Desc"]]
-        });
-
-        if (!request) {
-            return res.status(400).json({ error: `Request not found for ${sin_number}` });
-        }
-
-        if (request.request_type === 'internship' && request.placement_officer_approval !== 'approved') {
-            return res.status(400).json({ error: 'Placement officer approval is required for internship requests' });
-        } else if (request.request_type !== 'internship' && request.hod_approval !== 'approved') {
-            return res.status(400).json({ error: 'HOD approval is required' });
-        }
-
-        if (request.principal_approval !== 'pending') {
-            return res.status(400).json({ error: `Request already ${approval_status} by Principal` });
-        }
-
-        request.principal_approval = approval_status;
-        await request.save();
-
-        res.json({ message: 'Principal approval updated' });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-
-// get all student leave request data
-app.post('/studentsleaverequests', async (req,res)=>{
-    try{
-        const stdreq = await Request.findAll();
-        const responsedata={
-            status:200,
-            message:"data fetched",
-            stdreq,
+        let requestData = {
+            request_id: reqid,
+            sin_number,
+            staff_name, 
+            department,
+            request_type: normalized_request_type,
+            reason,
+            reason_Details,
+            pdf_path: pdfBuffer,
+            hod_approval: 'pending',
+            principal_approval: 'pending'
         };
-        res.json({  
-            status:200,
-            responsedata
-        })
-    }catch(err){
-        console.log(err);
-        res.status(500).json({error:"db error"})
+
+        if (normalized_request_type === 'permission') {
+            requestData.time_slot = time_slot;
+            requestData.startDate = startDate; // Ensure startDate is saved for permission
+            // endDate is not applicable for permission, so it won't be in requestData
+        } else { // For 'od' and 'leave'        
+            requestData.startDate = startDate;
+            requestData.endDate = endDate;
+        }
+
+        const request = await Request.create(requestData);
+
+        res.json({
+            success: true,
+            message: `Request submitted successfully ${reqid}`,
+            request_id: reqid
+        });
+
+    } catch (err) {
+        console.error("Request processing error:", err);
+        res.status(500).json({
+            error: "Database error", 
+            details: err.message
+        });
     }
 });
+
+
+app.post('/hod-leave-req', upload.single('pdf'), async (req, res) => {
+    try {
+        // Debug logging
+        console.log("Request received with file:", req.file);
+        console.log("Request body:", req.body);
+
+        const {sin_number, hod_name, department,
+            request_type, reason, reason_Details, startDate, endDate, time_slot} = req.body;
+
+        // Normalize request type
+        const normalized_request_type = request_type?.toLowerCase() || '';
+
+        // Handle PDF for requests
+        let pdfBuffer = null;
+        if (normalized_request_type === 'od' || normalized_request_type === 'leave') {
+            if (!startDate || !endDate) {
+                return res.status(400).json({ error: 'Start and end dates are required for OD/Leave requests' });
+            }
+
+            // Validate date format and logic
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            
+            // Check if dates are valid
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                return res.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD format' });
+            }
+
+            // Check if end date is before start date
+            if (end < start) {
+                return res.status(400).json({ error: 'End date cannot be before start date' });
+            }
+
+            // Check if dates are in the future
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (start < today) {
+                return res.status(400).json({ error: 'Start date cannot be in the past' });
+            }
+
+            if (!req.file) {
+                console.error("No PDF uploaded for request");
+                return res.status(400).json({ error: 'PDF required for this request type' });
+            }
+            pdfBuffer = req.file.buffer;
+        } else if (normalized_request_type === 'permission') {
+            // Validate time_slot for permission requests
+            if (!time_slot || !startDate) {
+                return res.status(400).json({ error: 'Time slot and Start Date are required for permission requests' });
+            }
+            // No PDF required for permission requests
+            if (req.file) {
+                console.log("PDF uploaded but not required for permission request");
+            }
+        } else {
+            return res.status(400).json({ error: 'Invalid request type. Must be od, leave, or permission' });
+        }
+
+        const reqid = uuidv4();
+
+        let requestData = {
+            request_id: reqid,
+            sin_number,
+            hod_name, 
+            department,
+            request_type: normalized_request_type,
+            reason,
+            reason_Details,
+            pdf_path: pdfBuffer,
+            principal_approval: 'pending'
+        };
+
+        if (normalized_request_type === 'permission') {
+            requestData.time_slot = time_slot;
+            requestData.startDate = startDate;
+            // Do not include endDate
+        } else {
+            requestData.startDate = startDate;
+            requestData.endDate = endDate;
+        }
+
+        const request = await Request.create(requestData);
+
+        res.json({
+            success: true,
+            message: `Request submitted successfully ${reqid}`,
+            request_id: reqid
+        });
+
+    } catch (err) {
+        console.error("Request processing error:", err);
+        res.status(500).json({
+            error: "Database error", 
+            details: err.message
+        });
+    }
+});
+
 module.exports = app;

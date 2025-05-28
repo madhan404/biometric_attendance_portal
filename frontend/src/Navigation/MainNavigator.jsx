@@ -10,13 +10,18 @@ import store from "../redux/store";
 import { AuthProvider } from "../context/AuthContext";
 import LoginPage from "../components/LoginPage/LoginPage";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminDashboard from "./AdminDashboard";
 import StudentDashboard from "./StudentDashboard";
+
+import MentorDashboard from "./MentorDashboard";
 import StaffDashboard from "./StaffDashboard";
+import Non_ClassAdvisorDashboard from "./Non_ClassAdvisorDashboard";
 import HodDashboard from "./HodDashboard";
+import Hod_PersonalDashboard from "./Hod_PersonalDashboard";
 import PlacementDashboard from "./PlacementDashboard";
 import PrincipalDashboard from "./PrincipalDashboard";
+// import StaffDashboardLayout from '../components/StaffDashboardLayout';
 
-// MainNavigator with Role-Based Routing
 export const MainNavigator = () => {
   const [userRole, setUserRole] = useState(() => {
     const user = sessionStorage.getItem("user");
@@ -27,83 +32,108 @@ export const MainNavigator = () => {
     return sessionStorage.getItem("authToken") !== null;
   });
 
-  // Update authentication and role on component mount
   useEffect(() => {
     const user = sessionStorage.getItem("user");
-    if (user) setUserRole(user.role);
+    if (user) setUserRole(JSON.parse(user).role);
     const authToken = sessionStorage.getItem("authToken");
     setIsAuthenticated(authToken !== null);
   }, []);
 
-  // Callback function to handle successful login
   const handleLogin = (userData) => {
     setIsAuthenticated(true);
-    // setUserRole(userData.role);
   };
 
-  // Determine initial route based on user role
-  const getDashboardRoute = () => {
-    switch (userRole) {
-      case "student":
-        return "/student-dashboard";
-      case "staff":
-        return "/staff-dashboard";
-      case "hod":
-        return "/hod-dashboard";
-      case "principal":
-        return "/principal-dashboard";
-      case "placement-officer":
-        return "/placement-officer-dashboard";
-      default:
-        return "/";
-    }
-  };
+  // const getDashboardRoute = () => {
+  //   switch (userRole) {
+  //     case "admin":
+  //       return "/admin-dashboard";
+  //     case "student":
+  //       return "/student-dashboard";
+  //     case "mentor":
+  //       return "/mentor-dashboard";
+  //     case "staff":
+  //       return "/staff-dashboard";
+  //     case "non_classadvisor":
+  //       return "/non_classadvisordashboard";
+  //     case "hod":
+  //       return "/hod-dashboard";
+  //     case "hodstaff":
+  //       return "/hod_personal-dashboard";
+  //     case "principal":
+  //       return "/principal-dashboard";
+  //     case "placement-officer":
+  //       return "/placement-dashboard";
+  //     default:
+  //       return "/";
+  //   }
+  // };
 
   return (
     <Provider store={store}>
       <AuthProvider>
         <Router>
           <Routes>
-            {/* Login Route */}
             <Route path="/" element={<LoginPage onLogin={handleLogin} />} />
-
-            {/* Role-Based Dashboards */}
             <Route
               path="/student-dashboard"
               element={
-                <ProtectedRoute
-                  isAuthenticated={isAuthenticated && userRole === "student"}
-                >
+                <ProtectedRoute isAuthenticated={isAuthenticated} requiredRole="student">
                   <StudentDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/mentor-dashboard"
+              element={
+                <ProtectedRoute isAuthenticated={isAuthenticated && userRole === "mentor"}>
+                  <MentorDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-dashboard"
+              element={
+                <ProtectedRoute isAuthenticated={isAuthenticated} requiredRole="admin">
+                  <AdminDashboard />
                 </ProtectedRoute>
               }
             />
             <Route
               path="/staff-dashboard"
               element={
-                <ProtectedRoute
-                  isAuthenticated={isAuthenticated && userRole === "staff"}
-                >
+                <ProtectedRoute isAuthenticated={isAuthenticated && userRole === "staff"}>
                   <StaffDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/non_classadvisordashboard"
+              element={
+                <ProtectedRoute isAuthenticated={isAuthenticated} requiredRole="staff">
+                  <Non_ClassAdvisorDashboard />
                 </ProtectedRoute>
               }
             />
             <Route
               path="/hod-dashboard"
               element={
-                <ProtectedRoute
-                  isAuthenticated={isAuthenticated && userRole === "hod"}
-                >
+                <ProtectedRoute isAuthenticated={isAuthenticated} requiredRole="hod">
                   <HodDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hod_personal-dashboard"
+              element={
+                <ProtectedRoute isAuthenticated={isAuthenticated} requiredRole="hodstaff">
+                  <Hod_PersonalDashboard />
                 </ProtectedRoute>
               }
             />
             <Route
               path="/principal-dashboard"
               element={
-                <ProtectedRoute
-                  isAuthenticated={isAuthenticated && userRole === "principal"}
-                >
+                <ProtectedRoute isAuthenticated={isAuthenticated} requiredRole="principal">
                   <PrincipalDashboard />
                 </ProtectedRoute>
               }
@@ -111,11 +141,7 @@ export const MainNavigator = () => {
             <Route
               path="/placement-dashboard"
               element={
-                <ProtectedRoute
-                  isAuthenticated={
-                    isAuthenticated && userRole === "placement-officer"
-                  }
-                >
+                <ProtectedRoute isAuthenticated={isAuthenticated} requiredRole="placement_officer">
                   <PlacementDashboard />
                 </ProtectedRoute>
               }

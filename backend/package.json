@@ -4,17 +4,22 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "archiver": "^6.0.2",
     "att_api": "file:",
+    "axios": "^1.9.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "csv-parse": "^5.6.0",
+    "csv-parser": "^3.2.0",
+    "csv-stringify": "^6.5.2",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
@@ -26,6 +31,8 @@
     "uuid": "^11.0.3"
   },
   "devDependencies": {
-    "sequelize-cli": "^6.6.2"
+    "jest": "^29.7.0",
+    "sequelize-cli": "^6.6.2",
+    "supertest": "^7.1.0"
   }
 }

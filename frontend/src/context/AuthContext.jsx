@@ -16,8 +16,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    setAuth(  );
-    localStorage.removeItem("auth");
+    setAuth(null);
+    // Clear all storage data
+    localStorage.clear();
+    sessionStorage.clear();
+    // Force reload to clear any cached data
+    window.location.href = '/';
   };
 
   return (
