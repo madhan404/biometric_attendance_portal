@@ -1,24 +1,24 @@
-# Attendance Portal
+# 📘 Attendance Portal
 
 A comprehensive attendance management system for educational institutions.
 
-## Features
+## 🚀 Features
 
 - User authentication with role-based access control
 - Attendance tracking and management
 - Leave request system
-- Dashboard for different user roles (Admin, Staff, Student, HOD, Principal)
+- Dashboard for different user roles (Admin, Staff, Student, HOD, Principal, Placement Officer)
 - Real-time attendance monitoring
 - Reports and analytics
 
-## Tech Stack
+## 🧰 Tech Stack
 
 - Frontend: React.js with Material-UI
 - Backend: Node.js with Express
 - Database: MySQL
 - Authentication: JWT
 
-## Prerequisites
+## 📦 Prerequisites
 
 - Node.js (v14 or higher)
 - MySQL (v8.0 or higher)
@@ -28,7 +28,7 @@ A comprehensive attendance management system for educational institutions.
 
 1. Clone the repository:
 ```bash
-git clone <https://github.com/madhan404/biometric_attendance_portal.git>
+git clone https://github.com/madhan404/biometric_attendance_portal.git
 cd attendance-portal
 ```
 
@@ -47,12 +47,12 @@ npm install
    - Create `.env` file in the backend directory
    - Add the following variables:
 ```
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=root
-DB_NAME=att
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
 JWT_SECRET=your_jwt_secret
-PORT=3001
+PORT=
 ```
 
 4. Import the database:
@@ -71,7 +71,7 @@ cd frontend
 npm run dev
 ```
 
-## Deployment
+## 🚀 Deployment
 
 1. Build the frontend:
 ```bash
@@ -87,7 +87,7 @@ cd backend
 npm start
 ```
 
-## Database Migration
+## 🗄️ Database Migration
 
 To migrate the database to a new server:
 
@@ -101,7 +101,7 @@ mysqldump -u root -p att > att_backup.sql
 mysql -u root -p att < att_backup.sql
 ```
 
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create your feature branch
@@ -109,136 +109,6 @@ mysql -u root -p att < att_backup.sql
 4. Push to the branch
 5. Create a new Pull Request
 
-## License
+## 📄 License
 
-This project is licensed under the MIT License. 
-
-
-
-📘 Attendance Portal
-A comprehensive attendance management system for educational institutions.
-
-🚀 Features
-User authentication with role-based access control
-
-Attendance tracking and management
-
-Leave request system
-
-Dashboards for different user roles (Admin, Staff, Student, HOD, Principal)
-
-Real-time attendance monitoring
-
-Reports and analytics
-
-🧰 Tech Stack
-Frontend: React.js with Material-UI
-
-Backend: Node.js with Express
-
-Database: MySQL
-
-Authentication: JWT
-
-📦 Prerequisites
-Node.js (v14 or higher)
-
-MySQL (v8.0 or higher)
-
-npm or yarn
-
-⚙️ Setup Instructions
-1. Clone the repository
-bash
-Copy
-Edit
-git clone https://github.com/madhan404/biometric_attendance_portal.git
-cd biometric_attendance_portal
-2. Install dependencies
-Backend:
-bash
-Copy
-Edit
-cd backend
-npm install
-Frontend:
-bash
-Copy
-Edit
-cd ../frontend
-npm install
-3. Configure environment variables
-Create a .env file inside the backend directory
-
-Add the following variables:
-
-env
-Copy
-Edit
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=root
-DB_NAME=att
-JWT_SECRET=your_jwt_secret
-PORT=3001
-4. Import the database
-bash
-Copy
-Edit
-mysql -u root -p att < att_backup.sql
-5. Start the development servers
-Backend:
-bash
-Copy
-Edit
-cd backend
-npm run dev
-Frontend:
-bash
-Copy
-Edit
-cd ../frontend
-npm run dev
-🚀 Deployment
-1. Build the frontend
-bash
-Copy
-Edit
-cd frontend
-npm run build
-2. Configure production environment variables
-Make sure to set appropriate values for database and JWT in your .env file.
-
-3. Start the production backend server
-bash
-Copy
-Edit
-cd backend
-npm start
-🗄️ Database Migration
-To migrate the database to a new server:
-
-Export the database:
-bash
-Copy
-Edit
-mysqldump -u root -p att > att_backup.sql
-Import it on the new server:
-bash
-Copy
-Edit
-mysql -u root -p att < att_backup.sql
-🤝 Contributing
-Fork the repository
-
-Create your feature branch
-
-Commit your changes
-
-Push to your branch
-
-Open a Pull Request
-
-📄 License
 This project is licensed under the MIT License.
-
