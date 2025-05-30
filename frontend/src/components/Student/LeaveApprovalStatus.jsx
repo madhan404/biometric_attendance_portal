@@ -354,7 +354,12 @@ const LeaveApprovalStatus = () => {
         setError("Failed to fetch leave status.");
       }
     } catch (err) {
-      setError(err.message || "Error fetching leave status.");
+      // Handle 404 error specifically as "no leave requests available"
+      if (err.response?.status === 404) {
+        setLeaveRequests([]);
+      } else {
+        setError(err.message || "Error fetching leave status.");
+      }
     } finally {
       setLoading(false);
     }

@@ -228,45 +228,66 @@ const StudentDashboard = () => {
       try {
         const user = JSON.parse(sessionStorage.getItem('user'));
         const sin_number = user?.sin_number;
-        // Fetch all data in parallel
-        const [attendanceRes, leaveRes, monthlyRes] = await Promise.all([
+        
+        // Fetch attendance and monthly data
+        const [attendanceRes, monthlyRes] = await Promise.all([
           axios.get(`${API_BASE_URL}/overall-attendance?UserId=${sin_number}`),
-          axios.post(`${API_BASE_URL}/stdleavests/leavests`, { sin_number }),
           axios.get(`${API_BASE_URL}/monthly-attendance?UserId=${sin_number}&year=${new Date().getFullYear()}`)
         ]);
-        // Attendance summary
+
+        // Set attendance summary
         setAttendanceSummary(attendanceRes.data.data);
-        // Leave requests
-        const leaveData = Array.isArray(leaveRes.data) ? leaveRes.data : [];
-        // Compute request summary
-        let total = leaveData.length;
-        let approved = 0, rejected = 0, pending = 0;
-        leaveData.forEach(req => {
-          const status = getOverallStatus(req);
-          if (status === 'Approved') approved++;
-          else if (status === 'Rejected') rejected++;
-          else pending++;
-        });
-        setRequestSummary({ total, approved, rejected, pending });
-        // Recent requests (last 5, sorted by createdAt desc)
-        const sortedRecent = [...leaveData].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
-        setRecentRequests(sortedRecent);
-        // Monthly trend
+        
+        // Set monthly trend
         setMonthlyTrend(monthlyRes.data.data?.monthlyData || []);
 
-        // Create notifications from recent requests
-        const newNotifications = sortedRecent
-          .filter(request => request.principal_approval?.toLowerCase() === "approved" || 
-                           request.principal_approval?.toLowerCase() === "rejected")
-          .map(request => ({
-            id: request.request_id,
-            text: `Your ${request.request_type} request has been ${request.principal_approval.toLowerCase()}`,
-            status: request.principal_approval.toLowerCase(),
-            createdAt: request.createdAt
-          }));
+        // Try to fetch leave requests, but handle 404 gracefully
+        try {
+          const leaveRes = await axios.post(`${API_BASE_URL}/stdleavests/leavests`, { sin_number });
+          const leaveData = Array.isArray(leaveRes.data) ? leaveRes.data : [];
+          
+          // Compute request summary
+          let total = leaveData.length;
+          let approved = 0, rejected = 0, pending = 0;
+          leaveData.forEach(req => {
+            const status = getOverallStatus(req);
+            if (status === 'Approved') approved++;
+            else if (status === 'Rejected') rejected++;
+            else pending++;
+          });
+          
+          setRequestSummary({ total, approved, rejected, pending });
+          
+          // Recent requests (last 5, sorted by createdAt desc)
+          const sortedRecent = [...leaveData]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 5);
+          setRecentRequests(sortedRecent);
 
-        setNotifications(newNotifications);
-        setNewActivitiesCount(newNotifications.length);
+          // Create notifications from recent requests
+          const newNotifications = sortedRecent
+            .filter(request => request.principal_approval?.toLowerCase() === "approved" || 
+                             request.principal_approval?.toLowerCase() === "rejected")
+            .map(request => ({
+              id: request.request_id,
+              text: `Your ${request.request_type} request has been ${request.principal_approval.toLowerCase()}`,
+              status: request.principal_approval.toLowerCase(),
+              createdAt: request.createdAt
+            }));
+
+          setNotifications(newNotifications);
+          setNewActivitiesCount(newNotifications.length);
+        } catch (error) {
+          if (error.response?.status === 404) {
+            // Handle no leave requests case
+            setRequestSummary({ total: 0, approved: 0, rejected: 0, pending: 0 });
+            setRecentRequests([]);
+            setNotifications([]);
+            setNewActivitiesCount(0);
+          } else {
+            throw error; // Re-throw other errors
+          }
+        }
       } catch (err) {
         setDashboardError(err.message || 'Failed to fetch dashboard data');
       } finally {
