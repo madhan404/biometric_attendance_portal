@@ -47,12 +47,13 @@ npm install
    - Create `.env` file in the backend directory
    - Add the following variables:
 ```
-DB_HOST=
-DB_USER=
-DB_PASSWORD=
-DB_NAME=
+DB_NAME=your_database_name
+DB_USER=your_database_user
+DB_PASS=your_database_password
+DB_HOST=your_database_host
 JWT_SECRET=your_jwt_secret
-PORT=
+PORT=your_port_number
+REACT_APP_API_URL=http://localhost:3001/api
 ```
 
 4. Import the database:
@@ -111,4 +112,4 @@ mysql -u root -p att < att_backup.sql
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
