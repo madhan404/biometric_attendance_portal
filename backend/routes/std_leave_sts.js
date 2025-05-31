@@ -27,6 +27,7 @@ app.post("/leavests", async (req, res) => {
         createdAt:sts.createdAt,
         startDate:sts.startDate,
         endDate:sts.endDate,
+        mentor_approval: sts.mentor_approval,
         class_advisor_approval: sts.class_advisor_approval,
         hod_approval: sts.hod_approval,
         principal_approval: sts.principal_approval,
