@@ -2086,6 +2086,24 @@ const Dashboard = () => {
           />
         </IconButton>
       </Tooltip>
+
+      <Menu
+        anchorEl={profileAnchorEl}
+        open={Boolean(profileAnchorEl)}
+        onClose={handleProfileMenuClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <MenuItem onClick={handleProfileDialogOpen}>Profile</MenuItem>
+        <MenuItem onClick={handlePasswordDialogOpen}>Change Password</MenuItem>
+        <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
+      </Menu>
     </Box>
   </Toolbar>
 </AppBar>
@@ -2213,6 +2231,7 @@ const Dashboard = () => {
                     height: isMobile ? 100 : 150,
                     border: `2px solid white`,
                   }}
+                  onClick={() => setProfileDialogOpen(true)}
                 >
                   {!userDatas?.photo && !photoPreview && (userDatas?.name?.charAt(0) || 'A')}
                 </Avatar>
