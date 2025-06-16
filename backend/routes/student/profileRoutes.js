@@ -1,0 +1,151 @@
+const express = require('express');
+const router = express.Router();
+const bcrypt = require('bcrypt');
+const User = require('../../models/User');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Ensure uploads directory exists
+const uploadDir = 'uploads/profile_pictures';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+// File filter to accept only images
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only image files are allowed!'), false);
+  }
+};
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
+
+// Update profile information
+router.put('/update-profile/:sin_number', upload.single('photo'), async (req, res) => {
+  try {
+    const { sin_number } = req.params;
+    const { email, phone, parent_phone, address } = req.body;
+    
+    // Validate sin_number
+    if (!sin_number) {
+      return res.status(400).json({ error: 'sin_number is required in URL parameters' });
+    }
+
+    // Find the user
+    const user = await User.findOne({ where: { sin_number } });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Handle photo upload
+    let photoBase64 = null;
+    if (req.file) {
+      const photoPath = req.file.path;
+      const photoBuffer = fs.readFileSync(photoPath);
+      photoBase64 = photoBuffer.toString('base64');
+      
+      // Clean up the temporary file
+      fs.unlinkSync(photoPath);
+    }
+
+    // Prepare update data
+    const updateData = {
+      ...(email && { email }),
+      ...(phone && { phone }),
+      ...(parent_phone && { parent_phone }),
+      ...(address && { address }),
+      ...(photoBase64 && { photo: photoBase64 })
+    };
+
+    // Update user
+    await User.update(updateData, {
+      where: { sin_number }
+    });
+
+    // Get updated user data
+    const updatedUser = await User.findOne({
+      where: { sin_number },
+      attributes: { exclude: ['password'] }
+    });
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: updatedUser
+    });
+
+  } catch (error) {
+    console.error('Profile update error:', error);
+    // If there's a file upload error, send specific message
+    if (error instanceof multer.MulterError) {
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'File size too large. Maximum size is 5MB' });
+      }
+      return res.status(400).json({ error: 'File upload error', details: error.message });
+    }
+    res.status(400).json({ 
+      error: 'Profile update failed', 
+      details: error.message 
+    });
+  }
+});
+
+// Change password
+router.put('/change-password/:sin_number', async (req, res) => {
+  try {
+    const { sin_number } = req.params;
+    const { oldPassword, newPassword } = req.body;
+    
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: 'Old password and new password are required' });
+    }
+
+    // Find user by sin_number
+    const user = await User.findOne({ where: { sin_number } });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify old password
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Old password is incorrect' });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update password
+    await User.update(
+      { password: hashedPassword },
+      { where: { sin_number } }
+    );
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Password change error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+module.exports = router;
