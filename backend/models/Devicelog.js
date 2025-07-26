@@ -4,11 +4,15 @@ const Sequelize = require("../config/db");
 const DeviceLogs = Sequelize.define(
   "devicelogs",
   {
-    DeviceLogId: {
-      type: DataTypes.MEDIUMINT,
+    id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
+    },
+    DeviceLogId: {      // Only keep if this exists and you want it
+      type: DataTypes.MEDIUMINT,
+      allowNull: true    // allowNull true or false based on data
     },
     DownloadDate: {
       type: DataTypes.STRING(19),
@@ -19,7 +23,7 @@ const DeviceLogs = Sequelize.define(
       allowNull: true
     },
     UserId: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(20),  // reflect actual DB length
       allowNull: true
     },
     LogDate: {
