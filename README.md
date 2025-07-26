@@ -110,6 +110,72 @@ mysql -u root -p att < att_backup.sql
 4. Push to the branch
 5. Create a new Pull Request
 
+## 🖼️ Screenshots
+
+### 🔐 Login Page  
+![Login Page](frontend/public/readme-assets/login_page.png)
+
+### 🛠️ Admin Dashboard  
+![Admin Dashboard](frontend/public/readme-assets/admin-dashboard.png)
+
+### 👨‍🏫 Staff Dashboard  
+![Staff Dashboard](frontend/public/readme-assets/staff-dashboard.png)
+
+### 👨‍🏫 Principal Dashboard  
+![Principal Dashboard](frontend/public/readme-assets/principal-dashboard.png)
+
+### 🧑‍💼 HOD Dashboard  
+![HOD Dashboard](frontend/public/readme-assets/hod-dashboard.png)
+
+### 🧑‍🏫 Mentor Dashboard  
+![Mentor Dashboard](frontend/public/readme-assets/mentor-dashboard.png)
+
+### 📚 Class Advisor Dashboard  
+![Class Advisor Dashboard](frontend/public/readme-assets/classAdvisor-dashboard.png)
+
+### 🧑‍🎓 Class Advisor – Student List  
+![Class Advisor – Student List](frontend/public/readme-assets/classAdvisor-stdList.png)
+
+### 👥 Mentees List  
+![Mentees List](frontend/public/readme-assets/mentees-list.png)
+
+### 👤 All Users  
+![All Users](frontend/public/readme-assets/all-users.png)
+
+### 🗑️ Deleted Users  
+![Deleted Users](frontend/public/readme-assets/deleted-users.png)
+
+### 🎓 Student Dashboard  
+![Student Dashboard](frontend/public/readme-assets/student_dashboard.png)
+
+### 📝 Student Application  
+![Student Application](frontend/public/readme-assets/std-application.png)
+
+### 🕒 Student Attendance  
+![Student Attendance](frontend/public/readme-assets/std-attendance.png)
+
+### 🏖️ Student Leave Status  
+![Student Leave Status](frontend/public/readme-assets/std-leave-sts.png)
+
+### 📩 All Leave Requests  
+![All Leave Requests](frontend/public/readme-assets/allLeave-requests.png)
+
+### 🧾 Total Student List  
+![Total Student List](frontend/public/readme-assets/totalStd-list.png)
+
+### 🧑‍💼 Placement Officer Dashboard  
+![Placement Officer Dashboard](frontend/public/readme-assets/placementOfficer-dashboard.png)
+
+### 📊 Device Logs Analytics  
+![Device Logs Analytics](frontend/public/readme-assets/device-logs-analytics.png)
+
+### ⚙️ System Configuration  
+![System Configuration](frontend/public/readme-assets/system-config.png)
+
+### 💾 Backup  
+![Backup](frontend/public/readme-assets/backup.png)
+
+
 ## 📄 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
