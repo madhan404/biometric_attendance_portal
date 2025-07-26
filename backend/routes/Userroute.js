@@ -107,10 +107,10 @@ router.post("/login", async (req, res) => {
       status: 200,
       message: "Login successful",
       token,
-      loginLog: {
-        date: loginLog.login_date,
-        time: loginLog.login_time
-      },
+      // loginLog: {
+      //   date: loginLog.login_date,
+      //   time: loginLog.login_time
+      // },
       sin_number: user.sin_number,
       name: user.name,
       gender: user.gender,
@@ -125,7 +125,7 @@ router.post("/login", async (req, res) => {
       mentor: user.mentor,
       college: user.college,
       dayScholar_or_hosteller: user.dayScholar_or_hosteller,
-      quota: user.quota,
+      // quota: user.quota,
       position_1: user.position_1,
       position_2: user.position_2,
       parent_phone: user.parent_phone,

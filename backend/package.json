@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
+<<<<<<< HEAD
     "start": "node app.js",
+=======
+    "start": "nodemon app.js",
+>>>>>>> bc5f323 (🔁 Update: latest fixes and adjustments)
     "dev": "nodemon app.js"
   },
   "keywords": [],
