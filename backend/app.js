@@ -117,7 +117,7 @@ app.use((req, res) => {
 (async () => {
   try {
     console.log("Attempting to sync database...");
-    await sequelize.sync({ alter: false, force: false });
+    await sequelize.sync({ alter: true, force: false });
     console.log("Database synced successfully!");
 
     const port = process.env.DB_PORT || 3001;
