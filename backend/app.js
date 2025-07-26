@@ -57,7 +57,7 @@ const classadvisorAttendance = require('./routes/classadvisor/classadvisorAttend
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
