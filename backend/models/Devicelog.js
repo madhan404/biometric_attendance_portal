@@ -19,7 +19,7 @@ const DeviceLogs = Sequelize.define(
       allowNull: true
     },
     UserId: {
-      type: DataTypes.STRING(10),
+      type: DataTypes.STRING(50),
       allowNull: true
     },
     LogDate: {
