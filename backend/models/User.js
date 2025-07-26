@@ -9,7 +9,7 @@ const User = sequelize.define("user", {
   },
   sin_number: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: false,unique: true, 
     validate: {
       notNull: {
         msg: 'Sin number cannot be null'
