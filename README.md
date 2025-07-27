@@ -167,7 +167,7 @@ mysql -u root -p att < att_backup.sql
 ![Placement Officer Dashboard](frontend/public/readme-assets/placementOfficer-dashboard.png)
 
 ### 📊 Device Logs Analytics  
-![Device Logs Analytics](frontend/public/readme-assets/device-logs-analytics.png)
+![Device Logs Analytics](frontend/public/readme-assets/Device-Logs-Analytics.png)
 
 ### ⚙️ System Configuration  
 ![System Configuration](frontend/public/readme-assets/system-config.png)
@@ -175,6 +175,28 @@ mysql -u root -p att < att_backup.sql
 ### 💾 Backup  
 ![Backup](frontend/public/readme-assets/backup.png)
 
+## 🚀✨ Live Preview
+
+Experience the Attendance Portal in action!  
+👉 [**Try the Live Demo Here**](https://biometric-attendance-system.netlify.app/) 👈
+
+---
+
+### 👥 Example User Logins
+
+| 🏷️ Role              | 📧 Email                              | 🔑 Password |
+|----------------------|----------------------------------------|-------------|
+| 🎓 Student           | e21cs028@shanmugha.edu.in              | 12345       |
+| 👨‍🏫 Staff            | cajaseenash@shanmugha.edu.in           | 12345       |
+| 🧑‍💼 HOD              | hodcse@shanmugha.edu.in                | 12345       |
+| 🧑‍💻 Placement Officer| placementofficer@shanmugha.edu.in      | 12345       |
+| 👨‍🎓 Principal        | principalengg@shanmugha.edu.in         | 12345       |
+
+> ⚠️ **Note:** Admin credentials are not shared for security reasons, as admin users have full permissions.
+
+---
+
+Enjoy exploring the demo! 💡🎉
 
 ## 📄 License
 
