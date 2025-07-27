@@ -1,8 +1,10 @@
-require("dotenv").config();  // Load env vars early
+require("dotenv").config();  // Load environment variables early
+
 const express = require("express");
 const cors = require("cors");
 const sequelize = require("./config/db");
-// Routes
+
+// Import route modules
 const authRoutes = require("./routes/Userroute");
 const leavereq = require("./routes/Leavereq");
 const stdatt = require("./routes/studentRoutes");
@@ -45,22 +47,35 @@ const app = express();
 
 console.log("Starting Express app...");
 
-// CORS setup
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-    maxAge: 86400, // 24 hours
-  })
-);
+// CORS Setup
+// Allow requests only from your frontend URL or localhost for dev
+const allowedOrigins = [process.env.CLIENT_URL, "http://localhost:5173"].filter(Boolean);
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like curl or postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  maxAge: 86400
+}));
 
-// Body parsing with increased limits
+// Body parsers with payload size limits
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Routes registration
+// Optional: simple health check route
+app.get("/", (req, res) => {
+  res.send("Backend API is running. Use /api paths.");
+});
+
+// Register routes
 app.use('/api/student', profileRoutes);
 app.use("/api/users", authRoutes);
 app.use("/api/leavereq", leavereq);
@@ -98,7 +113,7 @@ app.use('/api/mentor', mentorRoutes);
 app.use('/api/mentor', mentorAttendance);
 app.use('/api/classadvisor', classadvisorRoutes);
 app.use('/api/classadvisor', classadvisorAttendance);
-app.use('/api/backup', backupRoutes); // before 404
+app.use('/api/backup', backupRoutes);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
@@ -108,16 +123,16 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 Not Found Handler
+// 404 handler for unmatched routes
 app.use((req, res) => {
   res.status(404).json({ error: 'Not Found' });
 });
 
-// Database sync & server start
+// Database sync and server start
 (async () => {
   try {
     console.log("Attempting to sync database...");
-    await sequelize.sync({ alter: true, force: false });
+    await sequelize.sync({ alter: true, force: false });  // use migrations or alter:true carefully
     console.log("Database synced successfully!");
 
     const port = process.env.PORT || 3001;
@@ -127,7 +142,7 @@ app.use((req, res) => {
     });
   } catch (error) {
     console.error("Unable to sync the database:", error);
-    process.exit(1); // Quit app on error sync
+    process.exit(1); // exit on failure
   }
 })();
 
