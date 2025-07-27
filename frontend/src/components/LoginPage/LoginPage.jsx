@@ -19,6 +19,7 @@ import {
   VisibilityOffRounded as VisibilityOffIcon
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
+
 const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:3001/api';
 
 const LoginPage = ({ onLogin }) => {
@@ -145,7 +146,7 @@ const LoginPage = ({ onLogin }) => {
         left: 0,
         width: '100%',
         height: '100%',
-        backgroundImage: 'url("https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Sri_Shanmugha_College_of_Engineering_and_Technology_entrance.jpg/1200px-Sri_Shanmugha_College_of_Engineering_and_Technology_entrance.jpg")', // Replace with your actual image URL
+        backgroundImage: 'url("https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Sri_Shanmugha_College_of_Engineering_and_Technology_entrance.jpg/1200px-Sri_Shanmugha_College_of_Engineering_and_Technology_entrance.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -283,7 +284,7 @@ const LoginPage = ({ onLogin }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 error={!!emailError}
-                helperText={emailError}
+                helperText={emailError || '\u00A0'}  // Reserve space with non-breaking space
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -305,7 +306,7 @@ const LoginPage = ({ onLogin }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   error={!!passwordError}
-                  helperText={passwordError}
+                  helperText={passwordError || '\u00A0'}  // Reserve space with non-breaking space
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -326,22 +327,22 @@ const LoginPage = ({ onLogin }) => {
                   }}
                 />
               )}
-              {error && (
-                <Typography 
-                  color="error" 
-                  variant="body2" 
-                  sx={{ 
-                    mt: 2, 
-                    textAlign: 'center',
-                    backgroundColor: 'error.light',
-                    color: 'error.contrastText',
-                    padding: 1,
-                    borderRadius: 1
-                  }}
-                >
-                  {error}
-                </Typography>
-              )}
+              {/* Error message always takes space to prevent layout shift */}
+              <Typography 
+                color="error" 
+                variant="body2" 
+                sx={{ 
+                  mt: 2, 
+                  textAlign: 'center',
+                  backgroundColor: error ? 'error.light' : 'transparent',
+                  color: error ? 'error.contrastText' : 'transparent',
+                  padding: 1,
+                  borderRadius: 1,
+                  minHeight: '36px',
+                }}
+              >
+                {error || '\u00A0'}
+              </Typography>
               
               {!showForgotPassword ? (
                 <Box sx={{ 
