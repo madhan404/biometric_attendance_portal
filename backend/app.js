@@ -50,21 +50,26 @@ console.log("Starting Express app...");
 // CORS Setup
 // Allow requests only from your frontend URL or localhost for dev
 const allowedOrigins = [process.env.CLIENT_URL, "http://localhost:5173"].filter(Boolean);
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like curl or postman)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error("Not allowed by CORS"));
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (!origin || allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin || "*");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
+
+    // Respond to OPTIONS requests quickly
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(204);
     }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-  maxAge: 86400
-}));
+
+    next();
+  } else {
+    // CORS origin not allowed
+    res.status(403).json({ error: "CORS origin denied" });
+  }
+});
 
 // Body parsers with payload size limits
 app.use(express.json({ limit: '50mb' }));
